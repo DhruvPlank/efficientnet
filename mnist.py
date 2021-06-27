@@ -12,13 +12,16 @@ import torchvision.transforms as transforms
 import torch.nn as nn
 import torch.nn.functional as F
 
-
+# tensorboardX
+from torch.utils.tensorboard import SummaryWriter
+writer = SummaryWriter()
 
 
 model_name = 'efficientnet-b0'
-BATCH_SIZE = 64
+BATCH_SIZE = 16
 SEED = 44
 EPOCHS = 4
+lr_rate = 0.001
 img_size = 32  
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -61,7 +64,7 @@ summary(model, (1, img_size, img_size))
 torch.manual_seed(SEED)
 # loss and optimizer
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=lr_rate)
 
 # train the model
 total_step = len(train_loader)
@@ -75,6 +78,7 @@ for epoch in range(EPOCHS):
         # forward pass
         output = model(images)
         loss = criterion(output, labels)
+        writer.add_scalar("Loss/train", loss, epoch)
 
         # backward and optimize
         optimizer.zero_grad()
@@ -90,6 +94,7 @@ print('*'*25)
 print(f'\n\n Time taken to train the model :: {train_time/60:.2f} minutes.')
 print('*'*25)
 
+writer.flush()
 
 # test the model
 model.eval()
@@ -106,3 +111,6 @@ with torch.no_grad():
         correct += (predicted == labels).sum().item()
 
     print('Test Accuracy of the model on the 10000 test images: {} %'.format(100 * correct / total))
+
+PATH = "mnist.pt"
+torch.save(model, PATH)
