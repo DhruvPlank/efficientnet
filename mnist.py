@@ -3,7 +3,7 @@ import random
 import time
 import numpy as np
 import torch
-from model import EfficientNet
+from efficientnet.model import EfficientNet
 from torchsummary import summary
 
 from torchvision.datasets import MNIST
@@ -19,10 +19,10 @@ pparam = dict(xlabel='Epochs', ylabel='Cross Entropy Loss')
 
 
 model_name = 'efficientnet-b0'
-BATCH_SIZE = 64
+BATCH_SIZE = 200
 SEED = 44
-EPOCHS = 20
-img_size = 32  
+EPOCHS = 2
+img_size = 32
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -88,7 +88,7 @@ class Net(nn.Module):
 
 model = Net()
 model.to(device)
-summary(model, (1, img_size, img_size))
+#summary(model, (1, img_size, img_size))
 
 
 # ------------------------------------------
@@ -190,8 +190,9 @@ PATH_1 = 'saved_models/'
 PATH_2 = 'figures/'
 
 MODEL = 'mnist.pt'
-if not os.path.isdir(PATH_1) and os.path.isdir(PATH_2):
+if not os.path.isdir(PATH_1):
     os.mkdir(PATH_1)
+if not os.path.isdir(PATH_2):
     os.mkdir(PATH_2)
 
 
