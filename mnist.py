@@ -27,7 +27,7 @@ img_size = 32
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 transform = transforms.Compose([
-    #transforms.Resize((img_size, img_size)),
+    transforms.Resize((img_size, img_size)),
     transforms.ToTensor(),
     transforms.Normalize((0.5, ), (0.5, )),
 ])
@@ -45,17 +45,17 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
                                           shuffle=False)
 
 
+model = EfficientNet.from_name(model_name)
+
+image_size = EfficientNet.get_image_size(model_name)        
+print(f'\n\nalthough b0 input img size is {image_size}; you can get away with a resize of {img_size}. \n')
+
+# adjust the final linear layer in and out features.
+feature = model._fc.in_features
+model._fc = torch.nn.Linear(feature,10)
+
 # ---------------------------------------------
-# model = EfficientNet.from_name(model_name)
-
-# image_size = EfficientNet.get_image_size(model_name)        
-# print(f'\n\nalthough b0 input img size is {image_size}; you can get away with a resize of {img_size}. \n')
-
-# # adjust the final linear layer in and out features.
-# feature = model._fc.in_features
-# model._fc = torch.nn.Linear(feature,10)
-# ---------------------------------------------
-
+'''
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -85,9 +85,17 @@ class Net(nn.Module):
         x = x.view(x.size(0), -1)
         output = self.out(x)
         return output
+ '''
+# ---------------------------------------------
 
-model = Net()
 model.to(device)
+child_count = 0
+for child in model.children():
+    print(f' Child {child_count} is :: ')
+    print(child)
+    child_count += 1
+
+
 #summary(model, (1, img_size, img_size))
 
 
